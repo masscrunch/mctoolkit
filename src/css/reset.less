@@ -1,0 +1,109 @@
+body {
+	margin:0;
+	padding:0;
+	font-size:14px;
+	font-family: "黑体", "Hiragino Sans GB" !important;
+}
+ul, ol, li {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+p, input, button,table, tr, th, td, thead, tbody ,pre{
+	padding:0;
+	margin:0;
+}
+strong{font-weight:bold;}
+h1, h2, h3, h4, h5, blockquote, dl, dt, dd {
+	margin:0;
+	padding:0;
+	font-weight:normal;
+}
+em, cite, i{font-style:normal;}
+img{border:none;}
+
+.rect(@width, @height){
+	width: @width;
+	height: @height;
+}
+
+.rect(@size){
+	width: @size;
+	height: @size;
+}
+.mb(@value){
+	margin-bottom:@value;
+}
+.mt(@value){
+	margin-top:@value;
+}
+.ml(@value){
+	margin-left:@value;
+}
+.mr(@value){
+	margin-right:@value;
+}
+.pb(@value){
+	padding-bottom:@value;
+}
+.pt(@value){
+	padding-top:@value;
+}
+.pl(@value){
+	padding-left:@value;
+}
+.pr(@value){
+	padding-right:@value;
+}
+.abs{
+	position:absolute;
+}
+.rel{
+	position:relative;
+}
+.noborder{
+	border:0 none !important;
+}
+
+.pull-left{
+	float:left;
+}
+.pull-right{
+	float:right;
+}
+
+.pos(@x){
+	left:@x;
+	top:@x;
+}
+.pos(@x, @y){
+	left:@x;
+	top:@y;
+}
+
+.inline-block(){
+	display:inline-block;
+}
+.block(){
+	display:block;
+}
+.inline(){
+	display:inline;
+}
+
+.hidden(){
+	display:none;
+}
+
+.pointer(){
+	cursor:pointer;
+}
+.clear{
+	*zoom:1
+}
+.clear:after {
+    content: '\20';
+    display: block;
+    height: 0;
+    clear: both
+}
