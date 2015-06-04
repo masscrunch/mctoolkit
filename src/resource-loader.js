@@ -2,7 +2,7 @@ define('resource-loader', function(require, exports, module){
 	var tools = require('./tools');
 	var EventEmitter = tools.EventEmitter;
 
-	var ResourceLoader = function(options){
+		var ResourceLoader = function(options){
 		this._initResourceLoader(options);
 	};
 	ResourceLoader.prototype = {
@@ -17,7 +17,13 @@ define('resource-loader', function(require, exports, module){
 			this.loadedCount = 0;
 			this.resources = {};
 			this.loading = 0;
-			this.unloadResources = [];
+			this.unloadResources = this.options.resources;
+			this.loaded = false;
+
+			var self = this;
+			this.on('load', function(){
+				self.loaded = true;
+			});
 		},
 		/**
 		 * [{name: '', type: '', src: ''}]
@@ -26,15 +32,26 @@ define('resource-loader', function(require, exports, module){
 			if(!resources){
 				resources = [];
 			}
-			resources = this.options.resources.concat(resources);
+			resources = this.unloadResources.concat(resources);
 			this.unloadResources = resources;
 			this.totalCount += resources.length;
 			var self = this;
+			if(this.unloadResources.length == 0){
+				this.emit('load', {total: this.totalCount});
+				return;
+			}
 			this.execQueue();
 		},
 		execQueue: function(){
+			if(this.unloadResources.length == 0){
+				// this.emit('load', {total: this.totalCount});
+				return;
+			}
 			while(this.loading <= this.options.maxConnections && this.unloadResources.length > 0){
 				var res = this.unloadResources.shift();
+				if(!res){
+					return;
+				}
 				(!!res.type) || (res.type = 'image');
 				switch(res.type){
 					case 'image':
@@ -96,6 +113,6 @@ define('resource-loader', function(require, exports, module){
 		}
 	};
 	tools.extend(ResourceLoader, EventEmitter);
-	
+
 	module.exports = ResourceLoader;
 });
