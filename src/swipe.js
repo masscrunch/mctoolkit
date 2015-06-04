@@ -1,5 +1,7 @@
-(function(){
+define('swipe', function(require, exports, module){
+var tools = require('./tools');
 
+var mix = tools.mix;
 
 var SwipeNode = function(node){
         this._initSwipeNode(node);
@@ -8,14 +10,16 @@ var SwipeNode = function(node){
 
     SwipeNode.prototype = {
         _initSwipeNode: function (node) {
-            EventEmitter.call(this);
+            tools.EventEmitter.call(this);
             this.touchInfo = {
                 startX: null,
                 startY: null,
                 endX: null,
                 endY: null,
                 diffX: null,
-                diffY: null
+                diffY: null,
+                lastX: null,
+                lastY: null
             };
 
             this.startTime = 0;
@@ -25,7 +29,10 @@ var SwipeNode = function(node){
                 var touch = e.touches[0];
                 self.touchInfo.startX = touch.clientX;
                 self.touchInfo.startY = touch.clientY;
+                self.touchInfo.lastX = null;
+                self.touchInfo.lastY = null;
                 self.startTime = new Date().getTime();
+                self.emit("swipestart", self.touchInfo);
             }, false);
             node.addEventListener('touchmove', function(e){
                 var touch = e.changedTouches[0];
@@ -33,6 +40,10 @@ var SwipeNode = function(node){
                 self.touchInfo.endX = touch.clientX;
                 self.touchInfo.endY = touch.clientY;
 
+                if(self.touchInfo.lastX === null && self.touchInfo.lastY === null){
+                    self.touchInfo.lastX = self.touchInfo.startX;
+                    self.touchInfo.lastY = self.touchInfo.startY;
+                }
                 var diffX = touch.clientX - self.touchInfo.startX;
                 var diffY = touch.clientY - self.touchInfo.startY;
 
@@ -40,17 +51,23 @@ var SwipeNode = function(node){
                     diffX: diffX,
                     diffY: diffY
                 }));
+                self.touchInfo.lastX = self.touchInfo.endX;
+                self.touchInfo.lastY = self.touchInfo.endY;
             }, false);
             node.addEventListener('touchend', function (e) {
                 self.endTime = new Date().getTime();
-                if(self.endTime - self.startTime > 900){
-                    return;
-                }
+                
                 var touch = e.changedTouches[0];
                 self.touchInfo.endX = touch.clientX;
                 self.touchInfo.endY = touch.clientY;
                 var diffX = self.touchInfo.diffX = self.touchInfo.endX - self.touchInfo.startX;
                 var diffY = self.touchInfo.diffY = self.touchInfo.endY - self.touchInfo.startY;
+
+                self.emit('swipeend', mix({}, self.touchInfo));
+
+                if(self.endTime - self.startTime > 900){
+                    return;
+                }
                 if(Math.abs(diffX) > 10 || Math.abs(diffY) > 10){
                     self.emit('swipe', mix({}, self.touchInfo));
                 }
@@ -73,14 +90,14 @@ var SwipeNode = function(node){
 
 
     };
-    extend(SwipeNode, EventEmitter);
+    tools.extend(SwipeNode, tools.EventEmitter);
     var Swipe = function(selector){
         this._initSwipe(selector);
     };
     Swipe.prototype = {
         _initSwipe: function (selector) {
-            EventEmitter.call(this);
-            this.events = ['swipe', 'swiperight', 'swipeleft', 'swipeup', 'swipedown', 'swipemove'];
+            tools.EventEmitter.call(this);
+            this.events = ['swipe', 'swiperight', 'swipeleft', 'swipeup', 'swipedown', 'swipemove', 'swipestart', 'swipeend'];
             var self = this;
             var nodes = document.querySelectorAll(selector);
             for(var i = 0, len = nodes.length; i < len; i++){
@@ -105,9 +122,9 @@ var SwipeNode = function(node){
             });
         }
     };
-    extend(Swipe, EventEmitter);
-    window.swipe = function(selector){
+    tools.extend(Swipe, tools.EventEmitter);
+    module.exports = function(selector){
         return new Swipe(selector);
     };
 
-})();
+});
