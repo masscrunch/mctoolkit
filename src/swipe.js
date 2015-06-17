@@ -49,7 +49,9 @@ var SwipeNode = function(node){
 
                 self.emit('swipemove', mix(self.touchInfo, {
                     diffX: diffX,
-                    diffY: diffY
+                    diffY: diffY,
+                    relDiffX: touch.clientX - self.touchInfo.lastX,
+                    relDiffY: touch.clientY - self.touchInfo.lastY
                 }));
                 self.touchInfo.lastX = self.touchInfo.endX;
                 self.touchInfo.lastY = self.touchInfo.endY;
