@@ -32,6 +32,38 @@ define('slide-effects', function(require, exports, module){
 		show: function(){}
 	};
 
+	var VerticalEffect = function(){
+		this._initBaseEffect();
+	};
+
+	VerticalEffect.prototype = {
+		_initBaseEffect: function(){
+			this.isAnimating = false;
+		},
+
+		initUI: function(){},
+
+		relayout: function(){},
+
+		next: function(current, next, callback){
+			current.css({top: 0}).show().animate({top: 0-current.height()});
+			next.css({top: next.height()}).show().animate({top: 0}, function(){
+				callback && callback();
+				// self.isAnimating = false;
+			});	
+		},
+
+		prev: function(current , prev, callback){
+			current.css({top: 0}).show().animate({top: current.height()});
+            prev.css({top: 0 - prev.height()}).show().animate({top: 0}, function(){
+            	callback && callback();
+                // self.isAnimating = false;
+            });
+		},
+
+		show: function(){}
+	};
+
 	var FadeEffect = function(){
 		this._initFadeEffect();
 	};
@@ -67,5 +99,6 @@ define('slide-effects', function(require, exports, module){
 
 	exports.BaseEffect = BaseEffect;
 	exports.FadeEffect = FadeEffect;
+	exports.VerticalEffect = VerticalEffect;
 
 });

@@ -128,6 +128,7 @@ define('slider', function(require, exports, module){
             var nextId = this.pointer + 1;
             if(self.pointer >= self.total - 1){
                 if(!this.options.loop){
+                    self.emit("nextEnd", {pointer: self.pointer});
                     return;
                 }
 
@@ -139,8 +140,13 @@ define('slider', function(require, exports, module){
 
             this.isAnimating = true;
 
+            this.emit('beforeShow', {pointer: this.pointer});
+            this.emit('beforeNext', {pointer: this.pointer});
+
             this.effect.next(current, next, function(){
                 self.isAnimating = false;
+                self.emit('afterShow', {pointer: nextId});
+                self.emit('afterNext', {pointer: nextId});
             });
 
             this.pointer = nextId;
@@ -160,6 +166,7 @@ define('slider', function(require, exports, module){
             var prevId = this.pointer - 1;
             if(self.pointer <= 0){
                 if(!this.options.loop){
+                    self.emit("prevEnd", {pointer: self.pointer});
                     return;
                 }
 
@@ -170,9 +177,12 @@ define('slider', function(require, exports, module){
             var prev = this.panel.find(itemSelector).eq(prevId);
 
             this.isAnimating = true;
-
+            this.emit('beforeShow', {pointer: this.pointer});
+            this.emit('beforePrev', {pointer: this.pointer});
             this.effect.prev(current, prev, function(){
                 self.isAnimating = false;
+                self.emit('afterShow', {pointer: prevId});
+                self.emit('afterPrev', {pointer: prevId});
             });
 
             this.pointer = prevId;
